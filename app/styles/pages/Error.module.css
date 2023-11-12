@@ -1,0 +1,39 @@
+@tailwind components;
+
+@layer components {
+  .title {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .prev-button-box {
+    text-align: center;
+  }
+  .prev-button {
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    padding: 20px;
+    background: #5dbccc url(/images/icon_prev_white.svg) no-repeat left 20px top 50% / 6px 12px;
+    transition: all .2s ease-out;
+    display: inline-block;
+  }
+  .prev-button:hover {
+    opacity: 0.6;
+  }
+
+  /* PC */
+  @media screen and (min-width: 481px) {
+    .prev-button {
+      width: 250px;
+    }
+  }
+  /* SP */
+  @media screen and (max-width: 480px) {
+    .prev-button {
+      display: block;
+      width: 80vw;
+      margin: auto;
+    }
+  }
+}

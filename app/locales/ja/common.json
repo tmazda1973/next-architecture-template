@@ -1,0 +1,46 @@
+{
+  "head": {
+    "meta": {
+      "description": "説明文"
+    }
+  },
+  "header": {
+    "site": "サイト名",
+    "buttons": {
+      "menu": "メニュー",
+      "close": "閉じる"
+    }
+  },
+  "footer": {
+    "pages": {
+      "term": "利用規約",
+      "privacyPolicy": "プライバシーポリシー"
+    },
+    "copyright": "Copyright {{ year }} All rights reserved."
+  },
+  "dateFormat": {
+    "date": "YYYY年M月D日"
+  },
+  "breadcrumbs": {
+    "home": "ホーム",
+    "dashboard": "ダッシュボード"
+  },
+  "errorPage": {
+    "404": {
+      "meta": {
+        "title": "ページが見つかりません"
+      },
+      "title": "お探しのページは見つかりませんでした。"
+    },
+    "500": {
+      "meta": {
+        "title": "予期せぬエラーが発生しました"
+      },
+      "title": "予期せぬエラーが発生しました。しばらく時間をおいた後に再度お試しください。"
+    }
+  },
+  "buttons": {
+    "back": "戻る",
+    "doLogin": "ログインする"
+  }
+}

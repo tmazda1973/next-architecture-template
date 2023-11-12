@@ -1,0 +1,59 @@
+version: 0.2
+
+env:
+  variables:
+    DEPLOY_ROOT: "_deploy/code_build"
+    IMAGE_NAME_APP: "[APP_NAME]"
+    IMAGE_NAME_WEB: "[WEB_NAME]"
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - pip install awscli --upgrade
+      - aws --version
+      - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
+      - REPOSITORY_URI_APP=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${APP_ENV}-${IMAGE_NAME_APP}
+      - REPOSITORY_URI_WEB=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${APP_ENV}-${IMAGE_NAME_WEB}
+      - COMMIT_HASH=$(echo ${CODEBUILD_RESOLVED_SOURCE_VERSION} | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo Logging in to Docker Hub...
+      - echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USER} --password-stdin
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo "APP_ENV:${APP_ENV}"
+      - echo Registering the task definition...
+      - aws ecs register-task-definition --family ${APP_ENV}-s3-portal --cli-input-json file://${DEPLOY_ROOT}/task_definition/${APP_ENV}/task-definition.json
+      - echo Building the Docker image...
+      - echo "REPOSITORY_URI_APP:${REPOSITORY_URI_APP}"
+      - echo "REPOSITORY_URI_WEB:${REPOSITORY_URI_WEB}"
+      - >
+        docker build -t ${REPOSITORY_URI_APP}:latest -f ${DEPLOY_ROOT}/app/Dockerfile \
+          --build-arg app_env=${APP_ENV} \
+          --build-arg app_crypt_key=${APP_CRYPT_KEY} \
+          --build-arg app_crypt_iv=${APP_CRYPT_IV} \
+          --build-arg app_build_id=${COMMIT_HASH} \
+          --build-arg deploy_root="/${DEPLOY_ROOT}" .
+      - >
+        docker build -t ${REPOSITORY_URI_WEB}:latest -f ${DEPLOY_ROOT}/nginx/Dockerfile \
+          --build-arg app_env=${APP_ENV} \
+          --build-arg deploy_root="/${DEPLOY_ROOT}" .
+      - docker tag ${REPOSITORY_URI_APP}:latest ${REPOSITORY_URI_APP}:${IMAGE_TAG}
+      - docker tag ${REPOSITORY_URI_WEB}:latest ${REPOSITORY_URI_WEB}:${IMAGE_TAG}
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Updating ECS service...
+      - aws ecs update-service --cluster ${APP_ENV}-cluster --service ${APP_ENV}-service --task-definition ${APP_ENV}-task-definition
+      - echo Pushing the Docker images...
+      - docker push ${REPOSITORY_URI_APP}:latest
+      - docker push ${REPOSITORY_URI_APP}:$IMAGE_TAG
+      - docker push ${REPOSITORY_URI_WEB}:latest
+      - docker push ${REPOSITORY_URI_WEB}:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - IMAGE_DEFINITION_APP="{\"name\":\"${APP_ENV}-${IMAGE_NAME_APP}\",\"imageUri\":\"${REPOSITORY_URI_APP}:${IMAGE_TAG}\"}"
+      - IMAGE_DEFINITION_WEB="{\"name\":\"${APP_ENV}-${IMAGE_NAME_WEB}\",\"imageUri\":\"${REPOSITORY_URI_WEB}:${IMAGE_TAG}\"}"
+      - echo "[${IMAGE_DEFINITION_APP},${IMAGE_DEFINITION_WEB}]" > image_definitions.json
+artifacts:
+  files:
+    - image_definitions.json

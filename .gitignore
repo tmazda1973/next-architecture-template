@@ -1,0 +1,11 @@
+.idea
+*.iml
+.vagrant
+.vscode
+.run
+
+/out
+
+app/env/env.dev.js
+app/env/env.stg.js
+app/env/env.prod.js

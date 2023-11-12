@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./app/Dockerfile
+    container_name: app
+    tty: true
+    stdin_open: true
+    # TODO: デバッグモードで起動する場合、コメントアウトを外して有効にする
+#    command: yarn debug
+    ports:
+      - "3000:3000"
+      # TODO: デバッグモードで起動する場合、コメントアウトを外して有効にする
+#      - "9229:9229"
+    environment:
+      NODE_ENV: "development"
+      APP_ENV: "local"
+    volumes:
+      - ../app:/app
+      - /app/node_modules
+  web:
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    container_name: app-web
+    ports:
+      - "80:80"
+    depends_on:
+      - app
