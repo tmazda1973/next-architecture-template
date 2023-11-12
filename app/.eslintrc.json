@@ -1,0 +1,28 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "prettier",
+    "plugin:tailwindcss/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2015,
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true,
+      "experimentalObjectRestSpread": true
+    }
+  },
+  // tailwind.config.js などの config ファイル、ESLint の対象外にする
+  "ignorePatterns": ["*.config.js"],
+  "rules": {
+    "semi": ["error", "always"],
+    "semi-spacing": ["error", {"after": true, "before": false}],
+    "semi-style": ["error", "last"],
+    "no-extra-semi": "error",
+    "no-unexpected-multiline": "error",
+    "no-unreachable": "error",
+    "react-hooks/exhaustive-deps": "off"
+  }
+}
