@@ -32,7 +32,7 @@ const jwksUrl = `${NEXT_PUBLIC_OIDC_BASE_URI}${OIDC_ENDPOINT_JWKS}?p=${NEXT_PUBL
  * @param config コンフィグ定義
  * @constructor
  */
-const SelmidProvider = (config: OidcProviderConfig): OAuthConfig<any> => ({
+const OidcProvider = (config: OidcProviderConfig): OAuthConfig<any> => ({
   ...{
     name: "oidc",
     type: "oauth",
@@ -91,4 +91,4 @@ const SelmidProvider = (config: OidcProviderConfig): OAuthConfig<any> => ({
   ...config,
 });
 
-export default SelmidProvider;
+export default OidcProvider;
