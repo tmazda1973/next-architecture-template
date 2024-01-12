@@ -5,27 +5,18 @@ ENV LANG C.UTF-8 && \
     TZ='Asia/Tokyo'
 
 # Execute commands
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends && \
-    apt-get -y install imagemagick build-essential libpq-dev libfontconfig1 vim npm openssl && \
-    apt install -y \
+RUN apt-get update -qq \
+    && apt-get install -y --no-install-recommends \
+    && apt-get -y install imagemagick build-essential libpq-dev libfontconfig1 vim npm openssl \
+    && apt install -y \
         g++ \
         libicu-dev \
         libpq-dev \
         libzip-dev \
         zip \
         zlib1g-dev \
-        wget && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install Entrykit
-ENV ENTRYKIT_VERSION 0.4.0
-RUN wget https://github.com/progrium/entrykit/releases/download/v${ENTRYKIT_VERSION}/entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
-  && tar -xvzf entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
-  && rm entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
-  && mv entrykit /bin/entrykit \
-  && chmod +x /bin/entrykit \
-  && entrykit --symlink
+        wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install yarn
 ENV YARN_VERSION 1.22.19
@@ -41,6 +32,7 @@ WORKDIR ${APP_HOME}
 
 # Set environment variables
 ENV APP_ENV local
+ENV APP_BUILD_ID sAb4gvfVXDVBXq7zRoh8h7zP3gnaki4a
 
 # Copy setting files
 COPY ./app/settings/entrypoint.sh /tmp/entrypoint.sh
@@ -49,10 +41,7 @@ RUN mkdir -p /var/app
 COPY ./app/settings/startup.sh /var/app/startup.sh
 RUN chmod +x /var/app/startup.sh
 
-ENTRYPOINT [ \
-  "prehook", \
-    "/tmp/entrypoint.sh", "--" \
-]
+ENTRYPOINT ["/tmp/entrypoint.sh"]
 
 STOPSIGNAL SIGQUIT
 EXPOSE 3000

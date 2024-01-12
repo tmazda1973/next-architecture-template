@@ -18,15 +18,6 @@ RUN apt-get update -qq \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Entrykit
-ENV ENTRYKIT_VERSION 0.4.0
-RUN wget https://github.com/progrium/entrykit/releases/download/v${ENTRYKIT_VERSION}/entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
-    && tar -xvzf entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
-    && rm entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz \
-    && mv entrykit /bin/entrykit \
-    && chmod +x /bin/entrykit \
-    && entrykit --symlink
-
 # Install yarn
 ENV YARN_VERSION 1.22.19
 COPY --from=node /opt/yarn-v${YARN_VERSION} /opt/yarn
@@ -61,10 +52,7 @@ RUN mkdir -p /var/app
 COPY ${deploy_root}/app/settings/startup.sh /var/app/startup.sh
 RUN chmod +x /var/app/startup.sh
 
-ENTRYPOINT [ \
-  "prehook", \
-    "/tmp/entrypoint.sh", "--" \
-]
+ENTRYPOINT ["/tmp/entrypoint.sh"]
 
 STOPSIGNAL SIGQUIT
 EXPOSE 3000
